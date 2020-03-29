@@ -1,0 +1,30 @@
+{
+  "forms": {
+    "feedback": {
+      "name": "Feedback",
+      "actions": {
+        "email": [
+          {
+            "to": "george@czabania.com"
+          }
+        ]
+      },
+      "fields": {
+        "name": {
+          "type": "text"
+        },
+        "email": {
+          "type": "email",
+          "required": true
+        },
+        "product": {
+          "type": "text"
+        },
+        "message": {
+          "type": "text",
+          "required": true
+        }
+      }
+    }
+  }
+}
