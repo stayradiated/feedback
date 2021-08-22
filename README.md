@@ -1,4 +1,4 @@
-# [send me feedback](https://contact.george.czabania.com/?product=stayradiated/feedback)
+# [send me feedback](https://contact.george.czabania.com)
 
 Built with:
 
