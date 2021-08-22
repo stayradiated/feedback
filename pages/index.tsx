@@ -1,7 +1,12 @@
 import Head from 'next/head'
 import { useRouter } from 'next/router'
 
-import { NetlifyForm, Honeypot } from 'react-netlify-forms'
+import {
+  useNetlifyForm,
+  NetlifyFormProvider,
+  NetlifyFormComponent,
+  Honeypot,
+} from 'react-netlify-forms'
 
 interface ContactFormProps {
   product: string
@@ -10,25 +15,37 @@ interface ContactFormProps {
 function ContactForm(props: ContactFormProps) {
   const { product } = props
 
-  return (
-    <div className="mx-auto md:w-3/5 sm:w-full">
-      <NetlifyForm
-        name={product || 'Contact'}
-        action="/contact"
-        honeypotName="beep-boop"
-      >
-        {({ handleChange, success, error }) => {
-          if (success) {
-            return (
-              <div className="mx-auto md:w-3/5 sm:w-full bg-white shadow-md rounded p-8 text-gray-900 text-center">
-                Thank you for your feedback! 😊
-              </div>
-            )
-          }
+  const netlify = useNetlifyForm({
+    name: 'Contact',
+    action: '/',
+    honeypotName: 'deep-boop',
+    onSuccess: (response, context) => {
+      console.log(response, context)
+      console.log('Successfully sent form data to Netlify Server')
+    },
+  })
 
-          return (
+  const handleSubmit = (event: React.FormEvent) => {
+    netlify.handleSubmit(event, {
+      product,
+    })
+  }
+
+  if (netlify.success) {
+    return (
+      <div className="mx-auto md:w-3/5 sm:w-full bg-white shadow-md rounded p-8 text-gray-900 text-center">
+        Thank you for your feedback! 😊
+      </div>
+    )
+  }
+
+  return (
+    <NetlifyFormProvider {...netlify}>
+      <NetlifyFormComponent onSubmit={handleSubmit}>
+        <div className="mx-auto md:w-3/5 sm:w-full">
           <div className="bg-white shadow-md rounded p-8">
             <Honeypot />
+            <input type="hidden" name="product" value="product" />
             <div className="mb-4">
               <label
                 className="block text-gray-700 text-sm font-bold mb-2"
@@ -40,7 +57,7 @@ function ContactForm(props: ContactFormProps) {
                 className="bg-gray-200 appearance-none border-2 border-gray-200 rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-purple-500"
                 type="text"
                 name="name"
-                onChange={handleChange}
+                onChange={netlify.handleChange}
               />
             </div>
             <div className="mb-4">
@@ -55,7 +72,7 @@ function ContactForm(props: ContactFormProps) {
                 type="email"
                 name="email"
                 required
-                onChange={handleChange}
+                onChange={netlify.handleChange}
               />
             </div>
             <div className="mb-4">
@@ -73,7 +90,7 @@ function ContactForm(props: ContactFormProps) {
                 rows={7}
                 required
                 autoFocus
-                onChange={handleChange}
+                onChange={netlify.handleChange}
               />
             </div>
             <div className="mb-4">
@@ -84,16 +101,16 @@ function ContactForm(props: ContactFormProps) {
                 Send Feedback
               </button>
             </div>
-            {error && (
+            {netlify.error && (
               <div className="bg-red-50 border-2 border-red-400 rounded p-4 text-center">
                 <p>⚠️ Sorry, there was an issue sending your message. ⚠️</p>
                 <p>You can email me at george (at) czabania.com</p>
               </div>
             )}
           </div>
-        )}}
-      </NetlifyForm>
-    </div>
+        </div>
+      </NetlifyFormComponent>
+    </NetlifyFormProvider>
   )
 }
 

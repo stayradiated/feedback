@@ -1,13 +1,13 @@
 declare module 'react-netlify-forms' {
   import type React from 'react'
 
-  type UseNetlifyFormProps = {
+  type UseNetlifyFormOptions = {
     name?: string
     action?: string
     honeypotName?: string
     enableRecaptcha?: boolean
-    onSuccess?: () => void
-    onFailure?: () => void
+    onSuccess?: (response: Response, context: NetlifyFormContext) => void
+    onFailure?: (response: Response, context: NetlifyFormContext) => void
   }
 
   type NetlifyFormState = {
@@ -28,7 +28,10 @@ declare module 'react-netlify-forms' {
     handleChange: React.ChangeEventHandler<
       HTMLInputElement | HTMLTextAreaElement
     >
-    handleSubmit: () => void
+    handleSubmit: (
+      event?: null | React.FormEvent,
+      values?: Record<string, unknown>,
+    ) => void
     handleReset: () => void
     setHoneypotName: (honeypotName: string) => void
     enableRecaptcha: (enable: boolean) => void
@@ -41,10 +44,12 @@ declare module 'react-netlify-forms' {
   }
 
   type NetlifyFormComponentProps = React.HTMLProps<HTMLFormElement> & {
-    children: (context: NetlifyFormContext) => React.ReactNode
+    children:
+      | React.ReactNode
+      | ((context: NetlifyFormContext) => React.ReactNode)
   }
 
-  type NetlifyFormProps = UseNetlifyFormProps & {
+  type NetlifyFormProps = UseNetlifyFormOptions & {
     formProps?: Omit<NetlifyFormComponentProps, 'children'>
     children: (context: NetlifyFormContext) => React.ReactNode
   }
@@ -62,7 +67,7 @@ declare module 'react-netlify-forms' {
   const NetlifyForm: React.FunctionComponent<NetlifyFormProps>
   const NetlifyFormComponent: React.FunctionComponent<NetlifyFormComponentProps>
   const NetlifyFormProvider: React.FunctionComponent<NetlifyFormProviderProps>
-  const useNetlifyFormContext: () => NetlifyFormContext
+  const useNetlifyForm: (options: UseNetlifyFormOptions) => NetlifyFormContext
   const Recaptcha: React.FunctionComponent<RecaptchaProps>
 
   export {
@@ -70,7 +75,7 @@ declare module 'react-netlify-forms' {
     NetlifyForm,
     NetlifyFormComponent,
     NetlifyFormProvider,
-    useNetlifyFormContext,
+    useNetlifyForm,
     Recaptcha,
   }
 }
