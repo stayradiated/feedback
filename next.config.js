@@ -1,5 +1,7 @@
+/** @type {import('next').NextConfig} */
 module.exports = {
-  exportPathMap: {
-    '/': { page: '/index' }
-  }
+  reactStrictMode: true,
+  exportPathMap: () => ({
+    '/': { page: '/' },
+  }),
 }

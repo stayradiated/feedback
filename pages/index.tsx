@@ -1,117 +1,117 @@
 import Head from 'next/head'
-import { useForm, ValidationError } from '@statickit/react'
 import { useRouter } from 'next/router'
 
+import { NetlifyForm, Honeypot } from 'react-netlify-forms'
+
 interface ContactFormProps {
-  product: string,
+  product: string
 }
 
-function ContactForm (props: ContactFormProps) {
+function ContactForm(props: ContactFormProps) {
   const { product } = props
-
-  const [state, handleSubmit] = useForm('feedback', {
-    debug: true,
-    data: {
-      product,
-    },
-  })
-
-  if (state.succeeded) {
-    return (
-      <div className="mx-auto md:w-3/5 sm:w-full bg-white shadow-md rounded p-8 text-gray-900 text-center">
-        Thank you for your feedback! 😁
-      </div>
-    )
-  }
 
   return (
     <div className="mx-auto md:w-3/5 sm:w-full">
-      <form className="bg-white shadow-md rounded p-8" onSubmit={handleSubmit}>
-        <div className="mb-4">
-          <label
-            className="block text-gray-700 text-sm font-bold mb-2"
-            htmlFor="name"
-          >
-            Name
-          </label>
-          <input
-            className="bg-gray-200 appearance-none border-2 border-gray-200 rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-purple-500"
-            type="text"
-            name="name"
-          />
-        </div>
-        <div className="mb-4">
-          <label
-            className="block text-gray-700 text-sm font-bold mb-2"
-            htmlFor="email"
-          >
-            Email*
-          </label>
-          <input
-            className="bg-gray-200 appearance-none border-2 border-gray-200 rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-purple-500"
-            type="email"
-            name="email"
-            required
-          />
-          <div className="mt-4 text-red-600">
-            <ValidationError
-              field="email"
-              prefix="Email"
-              errors={state.errors}
-            />
+      <NetlifyForm
+        name={product || 'Contact'}
+        action="/contact"
+        honeypotName="beep-boop"
+      >
+        {({ handleChange, success, error }) => {
+          if (success) {
+            return (
+              <div className="mx-auto md:w-3/5 sm:w-full bg-white shadow-md rounded p-8 text-gray-900 text-center">
+                Thank you for your feedback! 😊
+              </div>
+            )
+          }
+
+          return (
+          <div className="bg-white shadow-md rounded p-8">
+            <Honeypot />
+            <div className="mb-4">
+              <label
+                className="block text-gray-700 text-sm font-bold mb-2"
+                htmlFor="name"
+              >
+                Name
+              </label>
+              <input
+                className="bg-gray-200 appearance-none border-2 border-gray-200 rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-purple-500"
+                type="text"
+                name="name"
+                onChange={handleChange}
+              />
+            </div>
+            <div className="mb-4">
+              <label
+                className="block text-gray-700 text-sm font-bold mb-2"
+                htmlFor="email"
+              >
+                Email*
+              </label>
+              <input
+                className="bg-gray-200 appearance-none border-2 border-gray-200 rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-purple-500"
+                type="email"
+                name="email"
+                required
+                onChange={handleChange}
+              />
+            </div>
+            <div className="mb-4">
+              <label
+                className="block text-gray-700 text-sm font-bold mb-2"
+                htmlFor="message"
+              >
+                Message*
+              </label>
+              <textarea
+                className="bg-gray-200 appearance-none border-2 border-gray-200 rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-purple-500"
+                placeholder="I'm a human. Please be nice."
+                name="message"
+                minLength={20}
+                rows={7}
+                required
+                autoFocus
+                onChange={handleChange}
+              />
+            </div>
+            <div className="mb-4">
+              <button
+                type="submit"
+                className="shadow bg-blue-500 hover:bg-blue-400 focus:shadow-outline focus:outline-none text-white font-bold py-2 px-4 rounded"
+              >
+                Send Feedback
+              </button>
+            </div>
+            {error && (
+              <div className="bg-red-50 border-2 border-red-400 rounded p-4 text-center">
+                <p>⚠️ Sorry, there was an issue sending your message. ⚠️</p>
+                <p>You can email me at george (at) czabania.com</p>
+              </div>
+            )}
           </div>
-        </div>
-        <div className="mb-4">
-          <label
-            className="block text-gray-700 text-sm font-bold mb-2"
-            htmlFor="message"
-          >
-            Message*
-          </label>
-          <textarea
-            className="bg-gray-200 appearance-none border-2 border-gray-200 rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-purple-500"
-            placeholder="I'm a human. Please be nice."
-            name="message"
-            minLength={20}
-            rows={7}
-            required
-            autoFocus
-          />
-          <div className="mt-4 text-red-600">
-            <ValidationError
-              field="message"
-              prefix="Message"
-              errors={state.errors}
-            />
-          </div>
-        </div>
-        <div>
-          <button
-            type="submit"
-            className="shadow bg-blue-500 hover:bg-blue-400 focus:shadow-outline focus:outline-none text-white font-bold py-2 px-4 rounded"
-          >
-            Send Feedback
-          </button>
-        </div>
-      </form>
+        )}}
+      </NetlifyForm>
     </div>
   )
 }
 
-const asString = (input: string | string[]): string => {
+const asString = (input: string | string[] | undefined): string => {
   if (typeof input === 'string') {
     return input
   }
-  if (Array.isArray(input)) {
+
+  if (Array.isArray(input) && input.length > 0) {
     return asString(input[0])
   }
+
   return ''
 }
 
 const Home = () => {
   const router = useRouter()
-
-  const product = asString(router.query.product)
+  const product = asString(router.query['product'])
 
   const title =
     typeof product === 'string' && product.trim().length > 0

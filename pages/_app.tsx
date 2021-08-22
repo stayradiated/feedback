@@ -1,13 +1,8 @@
-import { StaticKitProvider } from '@statickit/react'
+import '../styles/globals.css'
+import type { AppProps } from 'next/app'
 
-import '../styles.css'
-
-function App ({ Component, pageProps }) {
-  return (
-    <StaticKitProvider site="54e274d4bc01">
-      <Component {...pageProps} />
-    </StaticKitProvider>
-  )
+function MyApp({ Component, pageProps }: AppProps) {
+  return <Component {...pageProps} />
 }
 
-export default App
+export default MyApp
